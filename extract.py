@@ -7,7 +7,7 @@ import re
 import os
 import itertools
 
-fp = '.'
+fp = 'pgstorage/135699100302/*/*'
 extensions = ['pdf', 'png', 'jpg', 'jpeg']  # missing uppercase but idc
 
 
@@ -31,12 +31,13 @@ def json_info(regex: re.Pattern, dedup: bool = False, copy_to_path: str = None) 
     json_files = glob.glob(f'{fp}/*.json')
     token_set = set()
     for json_file in json_files:
+        print(json_file)
         with open(json_file, 'r') as f:
             t = json.load(f)
             if 'text' in t:
                 for line in t['text'].split('\n'):
                     tokens = re.findall(regex, line)
-                    copy_path = f'{copy_to_path}/{os.path.basename(json_file)[:-5]}'
+                    copy_path = f'{copy_to_path}/{os.path.basename(json_file)[:-5]}' if copy_to_path else None
                     if copy_path is not None and len(tokens) and not os.path.isfile(copy_path):
                         shutil.copy(json_file[:-5], copy_path)
                     for token in tokens:
@@ -59,12 +60,15 @@ def fix_outdated_json():
 
 def main():
     # n = 16  # num par proc
-    n = os.cpu_count() * 2
-    extract_loop(n)
+    # n = os.cpu_count() * 2
+    # extract_loop(n)
 
     email_re = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
+    # web_re = re.compile(r"(\.com)")
     # ip_re = re.compile(r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})")
-    json_info(email_re, copy_to_path="search/emails")
+    # email_re = re.compile(r'(yomweb)')
+    json_info(web_re)
+
 
 
 if __name__ == '__main__':
